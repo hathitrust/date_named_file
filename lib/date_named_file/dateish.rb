@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'date'
 module DateNamedFile
 
   class InvalidDateFormat < StandardError
@@ -140,23 +141,7 @@ module DateNamedFile
       end
     end
 
-    def template_matcher(template = @template)
-      dt                    = DateTime.parse('1111-11-11T11:11:11:11')
-      sample_date_expansion = dt.strftime extract_strftime_template(template)
-      parts                 = sample_date_expansion.scan(/\d+|[^\d]+/).map { |pt| regexify_part(pt) }
-      matcher_string        = template.sub INNTER_STRFTIME_TEMPLATE_MATCHER, '(' + parts.join('') + ')'
-      Regexp.new(matcher_string)
-    rescue TypeError => e
-      raise Error.new("Template must be of the form dddd<%Y%m%d>dddd where the stuff in angle brackets is a valid strftime template")
-    end
 
-    def regexify_part(pt)
-      if pt =~ /1+/
-        "(\\d{#{pt.size}})"
-      else
-        pt
-      end
-    end
 
     def digit_string?(str)
       ALL_DIGITS.match(str)

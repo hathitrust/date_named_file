@@ -1,8 +1,17 @@
-# DateNamedFile
+# DateNamedFile -- for files with embedded dates
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/date_named_file`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Usage
 
-TODO: Delete this and the text above, and describe your gem
+```ruby
+
+require 'date_named_file'
+
+update_files = DateNamedFile
+
+
+```
+
+
 
 ## Installation
 

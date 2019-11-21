@@ -1,6 +1,11 @@
 require "date_named_file/version"
+require 'date_named_file/template'
 
 module DateNamedFile
   class Error < StandardError; end
-  # Your code goes here...
+
+  def self.new(*args, **kwargs)
+    DateNamedFile::Template.new(*args, **kwargs)
+  end
+
 end

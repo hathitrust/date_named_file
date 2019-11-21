@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'date_named_file/dateish'
+require 'date_named_file/dated_file'
+
 module DateNamedFile
 
   # A Template is a model of a filename with a (restricted but) valid
@@ -15,7 +18,7 @@ module DateNamedFile
   # * Date/time parts must be in order (year, month, day, hour, minute, second)
   # * Everything that's not a year must be two digits, zero-padded if necessary
   class Template
-    INNTER_STRFTIME_TEMPLATE_MATCHER = /<(.*?)>/
+    INNER_STRFTIME_TEMPLATE_MATCHER = /<(.*?)>/
 
 
     # @return [Regexp] A regular expression that does its best to correctly match
@@ -44,25 +47,57 @@ module DateNamedFile
     attr_reader :template_string
 
     def template_string=(template)
-      @template_string = template
-      @matcher = template_matcher(template)
-      strftime_template = @template.gsub(/[<>]/, '')
+      @template_string  = template
+      @strftime_template = @template_string.gsub(/[<>]/, '')
+      @matcher          = template_matcher(@strftime_template)
       self
     end
+
+
+
+    def template_matcher(template = @strftime_template)
+      dt                    = DateTime.parse('1111-11-11T11:11:11:11')
+      sample_date_expansion = dt.strftime template
+      parts                 = sample_date_expansion.scan(/\d+|[^\d]+/).map { |pt| regexify_part(pt) }
+      matcher_string        = '(' + parts.join('') + ')'
+      Regexp.new(matcher_string)
+    rescue TypeError => e
+      raise Error.new("Template must be of the form dddd<%Y%m%d>dddd where the stuff in angle brackets is a valid strftime template")
+    end
+
+
+    def regexify_part(pt)
+      if pt =~ /1+/
+        "(\\d{#{pt.size}})"
+      else
+        pt
+      end
+    end
+
+    # Test to see if a filename matches the template
+    # @param [String] filename The string to test
+    # @return [Boolean]
+    def match?(filename)
+      @matcher.match? filename
+    end
+
+    alias_method :matches?, :match?
+
+
 
     # Compute the filename from plugging the given date_ish string/integer
     # into the template
     # @param [<anything date_ish>] date_ish (see #forgiving_dateify)
     # @return [String] the expanded filename
     def filename_for(date_ish)
-      forgiving_dateify(date_ish).strftime(@strftime_template)
+      Dateish.forgiving_dateify(date_ish).strftime(@strftime_template)
     end
 
     # Get a DateNamedFile::File for the given date/datetime
     # @param [<anything date_ish>] date_ish (see #forgiving_dateify)
     # @return [DateNamedFile::File] DateNamedFile::File for the given date in this template
     def at(date_ish)
-      DatedFile.from_date(self, date_ish)
+      DatedFile.new(self, date_ish)
     end
 
     # @return [DateNamedFile::File] DateNamedFile::File for today/right now
@@ -106,11 +141,6 @@ module DateNamedFile
     def daily_after(date_ish)
       daily_since(date_ish)[1..-1]
     end
-
-
-
-
-
 
 
   end
