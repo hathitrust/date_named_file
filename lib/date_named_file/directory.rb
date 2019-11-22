@@ -22,7 +22,7 @@ module DateNamedFile
       raise ArgumentError.new("Directory '#{path}' does not exist") unless @dir_path.exist?
       raise ArgumentError.new("'#{path}' isn't a directory") unless @dir_path.directory?
       super((@dir_path + template.template_string).to_s)
-      @matching_files = @dir_path.children.select{|x| self.match? x.to_s}.map{|x| DatedFile.from_filename(self,x.to_s)}
+      @matching_files = @dir_path.children.sort.select{|x| self.match? x.to_s}.map{|x| DatedFile.from_filename(self,x.to_s)}
     end
 
     alias_method :no_existence_check_at, :at
@@ -44,6 +44,10 @@ module DateNamedFile
 
     def after(date_ish)
       self.select {|f| f > date_ish}
+    end
+
+    def last
+      @matching_files.last
     end
 
 

@@ -37,6 +37,9 @@ module DateNamedFile
       return DateTime.now if date_ish == :today
       return (DateTime.now - 1) if date_ish == :yesterday
       return (DateTime.now + 1) if date_ish == :tomorrow
+      if date_ish.respond_to?(:to_i) and date_ish.to_i < 0
+        return DateTime.now + date_ish.to_i
+      end
       if date_ish.respond_to? :to_datetime
         date_ish.to_datetime
       else
@@ -124,7 +127,7 @@ module DateNamedFile
     def perform_simple_transforms(str)
       slash_matcher = %r[(\d{1,2})/(\d{1,2})/(\d{4})]
       if m = slash_matcher.match(str)
-        '%4d%02d%02d' % [m[3], m[2], m[1]]
+        '%4d-%02d-%02d' % [m[3], m[1], m[2]]
       else
         str
       end
