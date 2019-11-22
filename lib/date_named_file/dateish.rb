@@ -25,15 +25,18 @@ module DateNamedFile
     # a DateTime.
     #
     # Should handle:
-    #  * Something that's already a Date or Datetime, which just returns
-    #    itself as a DateTime.
+    #  * Something that response to #to_datetime, which just calls that.
+    #  * The symbols :today, :yesterday, and :tomorrow
     #  * unix timestamp (see #extract_unix_timestamp)
-    #  * string of digits (see #extract_undelimited_datetime)
+    #  * string of digits YYYYMMDD (see #extract_undelimited_datetime)
     #  * delimited string of digits (see #extract_delimited_datetime)
     # @param [#to_datetime, Integer, String] date_ish The thing to try to convert
     # @return [DateTime] Our best shot at a datetime
     # @raise [InvalidDateFormat] if we can't pull a datetime out of it
     def forgiving_dateify(date_ish)
+      return DateTime.now if date_ish == :today
+      return (DateTime.now - 1) if date_ish == :yesterday
+      return (DateTime.now + 1) if date_ish == :tomorrow
       if date_ish.respond_to? :to_datetime
         date_ish.to_datetime
       else
@@ -102,6 +105,7 @@ module DateNamedFile
 
 
     def extract_delimited_datetime(str)
+      str = perform_simple_transforms(str)
       validate_delimited_datetime!(str)
       year           = extract_year(str)
       non_year_parts = extract_non_year_parts(str)
@@ -114,6 +118,16 @@ module DateNamedFile
       raise InvalidDateFormat.new("Trying to parse as delimited date. '#{str}' looks to have non-two-digit parts (no zero padding?).")
     rescue NonDigitsInDelimitedDate
       raise InvalidDateFormat.new("Trying to parse as delimited date. '#{str}' looks to have non-digits between delimiters.")
+    end
+
+    # Deal with d/m/yyyy
+    def perform_simple_transforms(str)
+      slash_matcher = %r[(\d{1,2})/(\d{1,2})/(\d{4})]
+      if m = slash_matcher.match(str)
+        '%4d%02d%02d' % [m[3], m[2], m[1]]
+      else
+        str
+      end
     end
 
     def datetime_from_parts(parts)

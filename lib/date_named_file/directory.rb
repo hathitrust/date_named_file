@@ -11,6 +11,7 @@ module DateNamedFile
   # extract dates from them, etc.
   class Directory < DateNamedFile::Template
 
+    include Enumerable
     # @return [Pathname]
     attr_accessor :dir_path, :matching_files
 
@@ -24,16 +25,44 @@ module DateNamedFile
       @matching_files = @dir_path.children.select{|x| self.match? x.to_s}.map{|x| DatedFile.from_filename(self,x.to_s)}
     end
 
+    alias_method :no_existence_check_at, :at
+
+    def at(date_ish)
+      if has_file_for_date?(date_ish)
+        no_existence_check_at(date_ish)
+      else
+        MissingFile.new(self, date_ish)
+      end
+    end
+
+    alias_method :on, :at
+
+
+    def since(date_ish)
+      self.select {|f| f >= date_ish}
+    end
+
+    def after(date_ish)
+      self.select {|f| f > date_ish}
+    end
+
 
     # Does this directory have a file for the given date?
     # @param [<anything date_ish>] date_ish (see #forgiving_dateify)
     # @return [Boolean]
     def has_file_for_date?(date_ish)
-      target = self.at(date_ish)
-      puts target
+      target = self.no_existence_check_at(date_ish)
       (@dir_path + target).exist?
     end
 
+    alias_method :has?, :has_file_for_date?
+
+
+    # Yield matching files for each
+    def each
+      return enum_for(:each) unless block_given?
+      @matching_files.each {|f| yield f}
+    end
 
 
   end

@@ -6,7 +6,10 @@
 
 require 'date_named_file'
 
-update_files = DateNamedFile
+update_file_template = DateNamedFile.new('hathi_upd_%Y%m%d.txt.gz')
+update_files = update_file_template.in_dir('/path/to/datafiles')
+
+
 
 
 ```

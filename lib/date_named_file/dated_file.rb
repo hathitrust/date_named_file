@@ -6,6 +6,7 @@ require 'date_named_file/template'
 module DateNamedFile
 
   class DatedFile < SimpleDelegator
+    include Comparable
 
     attr_reader :datetime
     # @param [DateNamedFile::Template] template
@@ -18,8 +19,14 @@ module DateNamedFile
     def self.from_filename(template, filename)
       raise Error.new("String #{filename} does not match template '#{template.template_string}'") unless template.match? filename
       newobject = self.new(template)
-      newobject.set_datetime_from_filename(filename)
+      newobject.datetime = newobject.extract_datetime_from_filename(filename)
       newobject
+    end
+
+    # Defining to_datetime allows Dateish.forgiving_datetime to
+    # deal with it directly
+    def to_datetime
+      self.datetime
     end
 
     def datetime=(date_ish)
@@ -28,12 +35,24 @@ module DateNamedFile
       __setobj__ @path
     end
 
+    def match?(other)
+      @template.match? other.to_s
+    end
 
-    def set_datetime_from_filename(str)
-      if m = @template.matcher.match(str)
-        self.datetime = Dateish.forgiving_dateify(m[2..-1].join(''))
+    def <=>(other)
+      if self.match? other.to_s
+        self.datetime <=> extract_datetime_from_filename(other)
       else
-        self.datetime = DateTime.new(0)
+        d2 = Dateish.forgiving_dateify(other)
+        z = self.datetime <=> d2
+      end
+    end
+
+    def extract_datetime_from_filename(str)
+      if m = @template.matcher.match(str)
+        Dateish.forgiving_dateify(m[1..-1].join(''))
+      else
+        DateTime.new(0)
       end
     end
 
@@ -47,6 +66,15 @@ module DateNamedFile
     end
 
 
+  end
+
+  class MissingFile < DatedFile
+
+    def exist?
+      false
+    end
+
+    alias_method :exists?, :exist?
   end
 
   class OldDatedFile < SimpleDelegator
