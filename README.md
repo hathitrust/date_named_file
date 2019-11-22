@@ -7,9 +7,11 @@
 require 'date_named_file'
 
 update_file_template = DateNamedFile.new('hathi_upd_%Y%m%d.txt.gz')
-update_files = update_file_template.in_dir('/path/to/datafiles')
+update_files = update_file_template.in_dir('/tmp/')
 
+update_files.at(20111122) #=> 
 
+# Today is 2019-11-22
 
 
 ```

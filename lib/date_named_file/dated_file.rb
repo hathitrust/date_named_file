@@ -65,6 +65,11 @@ module DateNamedFile
       end
     end
 
+    # Override pretty-print so it shows up correctly in pry
+    def pretty_print(q)
+      q.text "<#{self.class}:#{@path}>"
+    end
+
 
   end
 
