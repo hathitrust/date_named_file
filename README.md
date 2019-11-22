@@ -57,7 +57,7 @@ upd.at('2019-11-11') > upd.at('2019-11-10') #=> true
 full_files = DateNamedFile.new('hathi_full_%Y-%m-%d.txt').in_dir('/tmp')
 
 last_update = upd.last #=> <DateNamedFile::DatedFile:/private/tmp/hathi_upd_20191121.txt.gz>
-last_full = full.ast #=> <DateNamedFile::DatedFile:/private/tmp/hathi_full_2019-11-20.txt.gz>
+last_full  = full.last #=> <DateNamedFile::DatedFile:/private/tmp/hathi_full_2019-11-20.txt.gz>
 
 last_update > last_full #=> true
 
