@@ -46,9 +46,12 @@ f = upd.first #=> <DateNamedFile::DatedFile:/private/tmp/hathi_upd_20191118.txt.
 
 # Let's get everything since the 20th
 
-upd.since '2019-11-20'
+upd.since '2019-11-20' #or 
+upd.since -2
 # => [<DateNamedFile::DatedFile:/private/tmp/hathi_upd_20191120.txt.gz>,
 #     <DateNamedFile::DatedFile:/private/tmp/hathi_upd_20191121.txt.gz>]
+
+
 
 # A DatedFiles compares based on the embedded DateTime
 upd.at('2019-11-11') > upd.at('2019-11-10') #=> true
