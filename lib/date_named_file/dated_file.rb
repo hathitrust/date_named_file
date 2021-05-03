@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
+require 'delegate'
 require 'date_named_file/template'
 
 module DateNamedFile

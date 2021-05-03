@@ -31,6 +31,8 @@ module DateNamedFile
   # NO support for mixing unix epoch with anything else. Why would you do that?
   class Template
 
+    include DateNamedFile::DateishHelpers
+
     SUBSTITUTION_REGEXP = {}
     SUBSTITUTION_REGEXP['%Y'] = '(\d{4})'
     %w[m d H M S].each {|x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d{2})'}
@@ -74,7 +76,7 @@ module DateNamedFile
     # @param [<anything date_ish>] date_ish (see #forgiving_dateify)
     # @return [String] the expanded filename
     def filename_for(date_ish)
-      Dateish.forgiving_dateify(date_ish).strftime(template_string)
+      forgiving_dateify(date_ish).strftime(template_string)
     end
 
     # Get a DateNamedFile::File for the given date/datetime
