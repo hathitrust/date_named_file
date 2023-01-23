@@ -59,7 +59,7 @@ module DateNamedFile
       end
     end
 
-    def extract_datetime_from_filename(str)
+    def extract_datetime_from_filename(str = @path)
       if (m = @template.matcher.match(str))
         Dateish.forgiving_dateify(m[1..].join(""))
       else

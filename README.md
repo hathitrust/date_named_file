@@ -6,13 +6,10 @@
 
 require 'date_named_file'
 
-update_file_template = DateNamedFile.new('hathi_upd_%Y%m%d.txt.gz')
-upd = update_file_template.in_dir('/tmp/')
-#=> #<DateNamedFile::Directory:0x00007fa4105de1a0...>
+# Set up to deal with our update files
+upd = DateNamedFile.new('hathi_upd_%Y%m%d.txt.gz', "/tmp/")
 
 # Today is 2019-11-22
-# All of these will produce either a DatedFile, whether or not 
-# it actually exists
 
 # These are all the same
 f = upd.yesterday
@@ -29,7 +26,6 @@ f = upd.at(-1)
 f.exist? #=> true
 
 # ...but today's is not
-upd.today #=>  <DateNamedFile::MissingFile:/private/tmp/hathi_upd_20191122.txt.gz>
 upd.today.exist? #=> false
 
 # So, which ones are there?
