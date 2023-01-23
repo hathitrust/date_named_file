@@ -2,6 +2,7 @@
 
 require 'pathname'
 require 'delegate'
+require "zinzout"
 require 'date_named_file/template'
 
 module DateNamedFile
@@ -59,12 +60,29 @@ module DateNamedFile
 
     def open
       raise "File #{@path.to_s} doesn't exist" unless @path.exist?
-      begin
-        Zlib::GzipReader.open(@path)
-      rescue Zlib::GzipFile::Error
-        File.open(@path)
+      f = Zinzout.zin(@path)
+      if block_given?
+        yield f
+        f.close
+      else
+        f
       end
     end
+
+    # The old "open" is fine, but add this for parallel naming
+    # with #open_for_write
+    alias_method(:open_for_read, :open)
+
+    def open_for_write
+      f = Zinzout.zout(@path)
+      if block_given?
+        yield f
+        f.close
+      else
+        f
+      end
+    end
+
 
     # Override pretty-print so it shows up correctly in pry
     def pretty_print(q)
