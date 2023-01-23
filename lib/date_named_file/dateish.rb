@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-require 'date'
+require "date"
 module DateNamedFile
-
   class InvalidDateFormat < StandardError
   end
 
@@ -15,8 +14,7 @@ module DateNamedFile
   # Provide some simple and very naïve methods to turn something that might be a date
   # into a date.
   module DateishHelpers
-
-    ALL_DIGITS       = /\A\d+\Z/
+    ALL_DIGITS = /\A\d+\Z/
     VALID_DELIMITERS = /[-_ :]/
 
     # Attempt to turn big integer (turned into a string of digits),
@@ -37,7 +35,7 @@ module DateNamedFile
       return DateTime.now if date_ish == :today
       return (DateTime.now - 1) if date_ish == :yesterday
       return (DateTime.now + 1) if date_ish == :tomorrow
-      if date_ish.respond_to?(:to_i) and date_ish.to_i < 0
+      if date_ish.respond_to?(:to_i) && (date_ish.to_i < 0)
         return DateTime.now + date_ish.to_i
       end
       if date_ish.respond_to? :to_datetime
@@ -54,7 +52,6 @@ module DateNamedFile
     rescue InvalidDateFormat => e
       raise InvalidDateFormat.new("Can't turn '#{date_ish}' into a date-time: #{e.message}")
     end
-
 
     def extract_from_digitstring(str)
       extract_unix_timestamp(str) or
@@ -78,7 +75,7 @@ module DateNamedFile
       return false unless digit_string?(digit_string)
       m = /\A(\d{4})(\d{2})(\d{2})(\d{2})?(\d{2})?(\d{2})?\d*\Z/.match(digit_string)
       if m
-        datetime_from_parts(m[1..-1].compact)
+        datetime_from_parts(m[1..].compact)
       else
         false
       end
@@ -91,7 +88,7 @@ module DateNamedFile
     # @return [DateTime, FalseClass] The valid DateTime, or false (for chaining)
     def extract_unix_timestamp(digit_string)
       if looks_like_unix_timestamp?(digit_string)
-        DateTime.strptime(digit_string, '%s')
+        DateTime.strptime(digit_string, "%s")
       else
         false
       end
@@ -106,15 +103,14 @@ module DateNamedFile
         /\A1[0-9]/.match(digit_string[0..1])
     end
 
-
     def extract_delimited_datetime(str)
       str = perform_simple_transforms(str)
       validate_delimited_datetime!(str)
-      year           = extract_year(str)
+      year = extract_year(str)
       non_year_parts = extract_non_year_parts(str)
-      all_parts      = non_year_parts.unshift(year)
+      all_parts = non_year_parts.unshift(year)
       datetime_from_parts(all_parts)
-    rescue ArgumentError => e
+    rescue ArgumentError
       # presumably a DateTime parse error
       false
     rescue NonTwoDigitDateParts
@@ -126,20 +122,20 @@ module DateNamedFile
     # Deal with d/m/yyyy
     def perform_simple_transforms(str)
       slash_matcher = %r[(\d{1,2})/(\d{1,2})/(\d{4})]
-      if m = slash_matcher.match(str)
-        '%4d-%02d-%02d' % [m[3], m[1], m[2]]
+      if (m = slash_matcher.match(str))
+        "%4d-%02d-%02d" % [m[3], m[1], m[2]]
       else
         str
       end
     end
 
     def datetime_from_parts(parts)
-      year           = parts[0]
-      non_year_parts = parts[1..-1].map { |dstring| dstring.scan(/\d\d/) }.flatten
-      all_parts      = non_year_parts.unshift(year).map(&:to_i)
+      year = parts[0]
+      non_year_parts = parts[1..].map { |dstring| dstring.scan(/\d\d/) }.flatten
+      all_parts = non_year_parts.unshift(year).map(&:to_i)
       DateTime.new(*all_parts)
     rescue ArgumentError
-      raise InvalidDateFormat.new("DateTime.new rejected extracted parts ([#{parts.join(',')}]).")
+      raise InvalidDateFormat.new("DateTime.new rejected extracted parts ([#{parts.join(",")}]).")
     end
 
     def extract_non_year_parts(str)
@@ -158,8 +154,6 @@ module DateNamedFile
       end
     end
 
-
-
     def digit_string?(str)
       ALL_DIGITS.match(str)
     end
@@ -173,15 +167,13 @@ module DateNamedFile
     end
 
     def extract_rest(str)
-      everything_after_the_year = str[4..-1]
+      everything_after_the_year = str[4..]
       ditch_leading_delimiters(everything_after_the_year)
     end
 
     def ditch_leading_delimiters(str)
-      str.sub(/\A#{VALID_DELIMITERS}/, '')
+      str.sub(/\A#{VALID_DELIMITERS}/o, "")
     end
-
-
   end
 
   module Dateish
