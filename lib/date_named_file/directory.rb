@@ -23,18 +23,6 @@ module DateNamedFile
       @matching_files = @dir_path.children.sort.select { |x| match? x.to_s }.map { |x| DatedFile.from_filename(self, x.to_s) }
     end
 
-    alias_method :no_existence_check_at, :at
-
-    def at(date_ish)
-      if has_file_for_date?(date_ish)
-        no_existence_check_at(date_ish)
-      else
-        MissingFile.new(self, date_ish)
-      end
-    end
-
-    alias_method :on, :at
-
     def since(date_ish)
       self.select { |f| f >= date_ish }
     end

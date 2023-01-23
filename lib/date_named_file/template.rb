@@ -33,6 +33,7 @@ module DateNamedFile
 
     SUBSTITUTION_REGEXP = {}
     SUBSTITUTION_REGEXP["%Y"] = '(\d{4})'
+
     %w[m d H M S].each { |x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d{2})' }
     %w[s Q 1].each { |x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d+)' }
 
@@ -80,6 +81,8 @@ module DateNamedFile
       DatedFile.new(self, date_ish)
     end
 
+    alias_method :on, :at
+
     # @return [DateNamedFile::File] DateNamedFile::File for today/right now
     def now
       at DateTime.now
@@ -124,8 +127,8 @@ module DateNamedFile
 
     def template_matcher(template)
       regexp_string = SUBSTITUTION_REGEXP.each_with_object(Regexp.escape(template)) do |subpair, templ|
-        pct, rxstring = *subpair
-        templ.gsub!(pct, rxstring)
+        percent_escape, regex_replacement = *subpair
+        templ.gsub!(percent_escape, regex_replacement)
       end
       Regexp.new(regexp_string)
     end

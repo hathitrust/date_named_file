@@ -11,8 +11,8 @@ upd = update_file_template.in_dir('/tmp/')
 #=> #<DateNamedFile::Directory:0x00007fa4105de1a0...>
 
 # Today is 2019-11-22
-# All of these will produce either a DatedFile or a MissingFile, 
-# depending on whether or not they exist in teh directory
+# All of these will produce either a DatedFile, whether or not 
+# it actually exists
 
 # These are all the same
 f = upd.yesterday
@@ -75,7 +75,14 @@ last_update #=> <DateNamedFile::DatedFile:/private/tmp/hathi_upd_20191121.txt.gz
 last_update.open.first #=> "mdp.39015018415946\tdeny\t..."
 
 
-# Open a new file (using zinzout) for writing to.
+# Can read or write to a file, with optional block
+
+new_path = upd.today
+new_path.exit? #=> false
+new_path.open_for_write do |out|
+  out.puts "Hey there!"
+end
+
 
 ```
 
