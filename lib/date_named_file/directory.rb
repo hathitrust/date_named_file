@@ -32,6 +32,18 @@ module DateNamedFile
       self.select { |f| f > date_ish }
     end
 
+    def before(date_ish)
+      self.select { |f| f < date_ish }
+    end
+
+    def on_or_before(date_ish)
+      self.select { |f| f <= date_ish }
+    end
+
+    def first
+      @matching_files.first
+    end
+
     def last
       @matching_files.last
     end
@@ -40,8 +52,8 @@ module DateNamedFile
     # @param [<anything date_ish>] date_ish (see #forgiving_dateify)
     # @return [Boolean]
     def has_file_for_date?(date_ish)
-      target = no_existence_check_at(date_ish)
-      (@dir_path + target).exist?
+      target = at(date_ish)
+      target.exist?
     end
 
     alias_method :has?, :has_file_for_date?

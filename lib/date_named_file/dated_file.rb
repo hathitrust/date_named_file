@@ -3,10 +3,14 @@
 require "pathname"
 require "zinzout"
 require "date_named_file/template"
+require "forwardable"
 
 module DateNamedFile
   class DatedFile
     include Comparable
+    extend Forwardable
+
+    def_delegators :@path, :exist?, :exists?, :readable?
 
     attr_reader :datetime, :template
     # @param [DateNamedFile::Template] template
@@ -52,8 +56,13 @@ module DateNamedFile
       end
     end
 
+    def writable?
+      @path.writable? or @path.parent.writable?
+    end
+
     def open
-      raise "File #{@path} doesn't exist" unless @path.exist?
+      raise "File #{@path} doesn't exist" unless exist?
+      raise "File #{@path} can't be read" unless readable?
       f = Zinzout.zin(@path)
       if block_given?
         yield f
@@ -68,6 +77,8 @@ module DateNamedFile
     alias_method(:open_for_read, :open)
 
     def open_for_write
+      raise "File #{@path} can't be written to" unless writable?
+
       f = Zinzout.zout(@path)
       if block_given?
         yield f
