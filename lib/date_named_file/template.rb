@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require 'date_named_file/dateish'
-require 'date_named_file/dated_file'
+require "date_named_file/dateish"
+require "date_named_file/dated_file"
 
 module DateNamedFile
-
   # A Template is a model of a filename with a (restricted but) valid
   # strftime formatting template embedded within.
   #
@@ -30,14 +29,12 @@ module DateNamedFile
   #
   # NO support for mixing unix epoch with anything else. Why would you do that?
   class Template
-
     include DateNamedFile::DateishHelpers
 
     SUBSTITUTION_REGEXP = {}
-    SUBSTITUTION_REGEXP['%Y'] = '(\d{4})'
-    %w[m d H M S].each {|x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d{2})'}
-    %w[s Q 1].each {|x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d+)'}
-
+    SUBSTITUTION_REGEXP["%Y"] = '(\d{4})'
+    %w[m d H M S].each { |x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d{2})' }
+    %w[s Q 1].each { |x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d+)' }
 
     # @return [String] the initial template string
     attr_reader :template_string
@@ -47,7 +44,6 @@ module DateNamedFile
     #   date in a filename
     attr_reader :matcher
 
-
     # @param [String] template Template string with embedded strftime format string
     # @example
     #   tmpl = DateNamedFile::Template.new("mystuff_daily%Y%m%d.tsv")
@@ -55,7 +51,6 @@ module DateNamedFile
       @template_string = template_string
       @matcher = template_matcher(template_string)
     end
-
 
     # Test to see if a filename matches the template
     # @param [String] filename The string to test
@@ -65,7 +60,6 @@ module DateNamedFile
     end
 
     alias_method :matches?, :match?
-
 
     def in_dir(dir)
       DateNamedFile::Directory.new(self, dir)
@@ -95,12 +89,12 @@ module DateNamedFile
 
     # @return [DateNamedFile::File] DateNamedFile::File for tomorrow (+24 hours)
     def tomorrow
-      at (DateTime.now + 1)
+      at(DateTime.now + 1)
     end
 
     # @return [DateNamedFile::File] DateNamedFile::File for yesterday (-24 hours)
     def yesterday
-      at (DateTime.now - 1)
+      at(DateTime.now - 1)
     end
 
     # Get a list of computed files based on all the dates from the
@@ -112,7 +106,7 @@ module DateNamedFile
       if dt.to_date > DateTime.now.to_date
         []
       else
-        daily_since(dt + 1).unshift(self.at(dt))
+        daily_since(dt + 1).unshift(at(dt))
       end
     end
 
@@ -125,7 +119,7 @@ module DateNamedFile
     # Like daily_since, but don't include the start date
     # @see #daily_since
     def daily_after(date_ish)
-      daily_since(date_ish)[1..-1]
+      daily_since(date_ish)[1..]
     end
 
     def template_matcher(template)
@@ -135,7 +129,5 @@ module DateNamedFile
       end
       Regexp.new(regexp_string)
     end
-
-
   end
 end

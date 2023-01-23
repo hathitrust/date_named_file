@@ -75,6 +75,8 @@ last_update #=> <DateNamedFile::DatedFile:/private/tmp/hathi_upd_20191121.txt.gz
 last_update.open.first #=> "mdp.39015018415946\tdeny\t..."
 
 
+# Open a new file (using zinzout) for writing to.
+
 ```
 
 
