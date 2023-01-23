@@ -20,7 +20,8 @@ module DateNamedFile
       raise ArgumentError.new("Directory '#{path}' does not exist") unless @dir_path.exist?
       raise ArgumentError.new("'#{path}' isn't a directory") unless @dir_path.directory?
       super((@dir_path + template.template_string).to_s)
-      @matching_files = @dir_path.children.sort.select { |x| match? x.to_s }.map { |x| DatedFile.from_filename(self, x.to_s) }
+      @base_template = template
+      @matching_files = @dir_path.children.sort.select { |x| base_template.match? x.to_s }.map { |x| file_from_filename(x.to_s) }
     end
 
     def since(date_ish)

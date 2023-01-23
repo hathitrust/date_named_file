@@ -38,7 +38,7 @@ module DateNamedFile
     %w[s Q 1].each { |x| SUBSTITUTION_REGEXP["%#{x}"] = '(\d+)' }
 
     # @return [String] the initial template string
-    attr_reader :template_string
+    attr_reader :template_string, :base_template
 
     # @return [Regexp] A regular expression that does its best to correctly match
     #   filenames that follow the template. Also used to try to extract the embedded
@@ -51,13 +51,28 @@ module DateNamedFile
     def initialize(template_string)
       @template_string = template_string
       @matcher = template_matcher(template_string)
+      @base_template = self
     end
 
     # Test to see if a filename matches the template
     # @param [String] filename The string to test
     # @return [Boolean]
     def match?(filename)
-      @matcher.match? filename
+      @matcher.match filename
+    end
+
+    def extract_datetime_from_filename(str = @path)
+      if (m = @base_template.match?(str))
+        Dateish.forgiving_dateify(m[1..].join(""))
+      else
+        DateTime.new(0)
+      end
+    end
+
+    def file_from_filename(filename)
+      raise Error.new("String #{filename} does not match template '#{template_string}'") unless @base_template.match? filename
+      dt = extract_datetime_from_filename(filename)
+      DatedFile.new(self).at(dt)
     end
 
     alias_method :matches?, :match?

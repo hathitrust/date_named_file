@@ -22,13 +22,6 @@ module DateNamedFile
 
     alias_method :directory, :dir
 
-    def self.from_filename(template, filename)
-      raise Error.new("String #{filename} does not match template '#{template.template_string}'") unless template.match? filename
-      newobject = new(template)
-      newobject.datetime = newobject.extract_datetime_from_filename(filename)
-      newobject
-    end
-
     # Create a new file from this one, using the same template/dir stuff
     def at(date_ish)
       self.class.new(@template, date_ish)
@@ -56,14 +49,6 @@ module DateNamedFile
       else
         d2 = Dateish.forgiving_dateify(other)
         datetime <=> d2
-      end
-    end
-
-    def extract_datetime_from_filename(str = @path)
-      if (m = @template.matcher.match(str))
-        Dateish.forgiving_dateify(m[1..].join(""))
-      else
-        DateTime.new(0)
       end
     end
 
