@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pathname"
 require "date_named_file/template"
 require "date_named_file/dated_file"
 
@@ -10,6 +9,7 @@ module DateNamedFile
   # extract dates from them, etc.
   class Directory < DateNamedFile::Template
     include Enumerable
+
     # @return [Pathname]
     attr_accessor :dir_path, :matching_files
 
