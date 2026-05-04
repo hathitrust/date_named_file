@@ -5,11 +5,11 @@ require "date_named_file/version"
 Gem::Specification.new do |spec|
   spec.name = "date_named_file"
   spec.version = DateNamedFile::VERSION
-  spec.authors = ["Bill Dueber"]
-  spec.email = ["bill@dueber.com"]
+  spec.authors = ["Bill Dueber", "Aaron Elkiss"]
+  spec.email = ["bill@dueber.com", "aelkiss@umich.edu"]
 
   spec.summary = "Utility to deal with files with embedded dates"
-  spec.homepage = "https://github.com/billdueber/date_named_file"
+  spec.homepage = "https://github.com/hathitrust/date_named_file"
   spec.license = "MIT"
 
   spec.metadata["homepage_uri"] = spec.homepage
@@ -30,6 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
-  spec.add_development_dependency "pry"
   spec.add_development_dependency "standard"
 end
