@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pathname"
 require "delegate"
 require "zinzout"
 require "date_named_file/template"

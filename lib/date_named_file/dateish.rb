@@ -33,8 +33,8 @@ module DateNamedFile
     # @raise [InvalidDateFormat] if we can't pull a datetime out of it
     def forgiving_dateify(date_ish)
       return DateTime.now if date_ish == :today
-      return (DateTime.now - 1) if date_ish == :yesterday
-      return (DateTime.now + 1) if date_ish == :tomorrow
+      return DateTime.now - 1 if date_ish == :yesterday
+      return DateTime.now + 1 if date_ish == :tomorrow
       if date_ish.respond_to?(:to_i) && (date_ish.to_i < 0)
         return DateTime.now + date_ish.to_i
       end
